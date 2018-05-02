@@ -57,15 +57,17 @@ export PATH=$PATH:$GOPATH:/usr/local/go/bin
 export PATH=$PATH:$(go env GOPATH)/bin
 
 # Python 
-export PATH="/Library/Frameworks/Python.framework/Versions/3.5/bin:${PATH}"
+export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH:"
 eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 
 # Rust
 source $HOME/.cargo/env
 
 # protoc
 export PATH=/Users/nmurthy/Tools/protoc-3.3.0-osx-x86_64/bin:$PATH
-
 
 
   
