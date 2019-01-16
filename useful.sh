@@ -104,6 +104,15 @@ docker build . -f Dockerfile -t orientdb
 docker run -ti -v `pwd`/databases:/orientdb/databases -p 2424:2424 -p 2480:2480 orientdb
 
 
+
+# =======================
+# openssl
+# =======================
+openssl x509 -noout -subject -in cert.pem  # read subject of cert
+openssl x509 -noout -text -in              # read full text of cert
+openssl s_client -CAfile ca.pem -cert cert.pem -key key.pem -connect host:port  # secure client example
+
+
 # =======================
 # misc
 # =======================
