@@ -5,9 +5,9 @@
 # cmd line prompt
 function precmd {
   if [[ $USER == "nmurthy" ]]; then
-    PS1="%{$fg[cyan]%}%n%{$fg[default]%}:%1~%# "
+    PS1="%{$fg[cyan]%}%n%{$fg[default]%}:%1~\$ "
   else 
-    PS1="%{$fg[cyan]%}%n@%{$fg[default]%}%m:%1~%# "
+    PS1="%{$fg[cyan]%}%n@%{$fg[default]%}%m:%1~\$ "
   fi
 }
 
