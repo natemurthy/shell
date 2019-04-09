@@ -124,4 +124,5 @@ openssl s_client -CAfile ca.pem -cert cert.pem -key key.pem -connect host:port  
 # generate random 4 byte hex string
 x=$(dd if=/dev/random bs=4 count=1 2>/dev/null | od -An -tx1 | tr -d ' \t\n')
 
-
+# perl command for randomly picking from string array
+perl -le 'print(("foo","bar","baz")[int rand 3])'
