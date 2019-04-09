@@ -49,6 +49,10 @@ du -ksh *
 sudo ss -tp | grep <port>
 sudo netstat -tup
 
+sudo conntrack -L | awk '{print $5,$4}' | grep src | \
+  cut -d '=' -f 2 | sort | uniq -c | sort -nr | \
+  perl -MSocket -nle 'm{\s((\d+\.){3}\d+)} && do{ ($hostname)=qx(host $1 10.233.0.3) =~ m{domain name pointer (.*)}; print "$_ ($hostname)"}' | head
+
 
 # =======================
 # Process info
@@ -116,5 +120,8 @@ openssl s_client -CAfile ca.pem -cert cert.pem -key key.pem -connect host:port  
 # =======================
 # misc
 # =======================
+
 # generate random 4 byte hex string
 x=$(dd if=/dev/random bs=4 count=1 2>/dev/null | od -An -tx1 | tr -d ' \t\n')
+
+
