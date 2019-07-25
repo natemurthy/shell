@@ -89,7 +89,14 @@ JVM_OPTIONS="-J-server -J-verbose:gc \
    -J-XX:+HeapDumpOnOutOfMemoryError        \
    -J-XX:HeapDumpPath=\"logs/\"             "
    
-   
+# =======================
+# git commands
+# =======================
+git log --format='%aN' | sort -u       # list all authors 
+git shortlog -s -n --all --no-merges   # number of commits per author
+
+
+
 # =======================
 # docker commands
 # =======================
