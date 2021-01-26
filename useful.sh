@@ -134,3 +134,6 @@ x=$(dd if=/dev/random bs=4 count=1 2>/dev/null | od -An -tx1 | tr -d ' \t\n')
 
 # perl command for randomly picking from string array
 perl -le 'print(("foo","bar","baz")[int rand 3])'
+
+# use colon separator in PATH declaration to expand path names one line at a time
+echo $PATH | awk -v RS=: 1
