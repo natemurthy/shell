@@ -123,7 +123,14 @@ openssl rand -base64 8                     # generate password
 openssl req -in mycsr.csr -noout -text     # read contents of cert request
 openssl x509 -noout -subject -in cert.pem  # read subject of cert
 openssl x509 -noout -text -in              # read full text of cert
-openssl s_client -CAfile ca.pem -cert cert.pem -key key.pem -connect host:port  # secure client example
+
+# secure client example
+openssl s_client -CAfile ca.pem -cert cert.pem -key key.pem -connect host:port 
+
+# verify server-side certs are properly configured for domain
+echo | openssl s_client -showcerts \
+  -servname $DOMAIN -connect $IP_ADDRESS:443 \
+  -verify 99 -verify_return_error
 
 
 # =======================
