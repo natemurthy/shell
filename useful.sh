@@ -33,8 +33,16 @@ fi
 # =======================
 # count and print all unique IP addresses in auth log
 grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' /var/log/auth.log | sort | uniq -c
-grep -E 'this.*(that1|that2|that3)'  # grep expression for 'this and (that1 or that2)' pattern
+
+# grep expression for 'this and (that1 or that2)' pattern
+grep -E 'this.*(that1|that2|that3)'  
+
+# grep for keyword only in dir/ with file extension .ext 
 grep -r --include \*.ext key_word dir/
+
+# turn off color
+grep -color=never
+
 
 
 # =======================
@@ -62,38 +70,13 @@ vmstat                      # another way of viewing context switching (http://l
 pidstat -w -I -t -p <pid> 3 # view context switches
 
 
-# =======================
-# Some nice Java commands
-# =======================
-sudo jcmd <pid> GC.run       # force a GC
-sudo jmap -histo:live <pid>  # view heap
-JVM_OPTIONS="-J-server -J-verbose:gc \
-   -J-Xms${JVM_HEAP_MIN:-32M}               \
-   -J-Xmx${JVM_HEAP_MAX:-1024M}             \
-   -J-XX:+AggressiveOpts                    \
-   -J-XX:+UseConcMarkSweepGC                \
-   -J-XX:+CMSParallelRemarkEnabled          \
-   -J-XX:+CMSClassUnloadingEnabled          \
-   -J-XX:+ScavengeBeforeFullGC              \
-   -J-XX:+CMSScavengeBeforeRemark           \
-   -J-XX:+UseCMSInitiatingOccupancyOnly     \
-   -J-XX:CMSInitiatingOccupancyFraction=70  \
-   -J-XX:-TieredCompilation                 \
-   -J-XX:+UseStringDeduplication            \
-   -J-XX:+PrintGC                           \
-   -J-XX:+PrintGCTimeStamps                 \
-   -J-Xloggc:logs/app-gc.log                \
-   -J-XX:+UseGCLogFileRotation              \
-   -J-XX:NumberOfGCLogFiles=10              \
-   -J-XX:GCLogFileSize=100M                 \
-   -J-XX:+HeapDumpOnOutOfMemoryError        \
-   -J-XX:HeapDumpPath=\"logs/\"             "
    
 # =======================
 # git commands
 # =======================
 git log --format='%aN' | sort -u       # list all authors 
 git shortlog -s -n --all --no-merges   # number of commits per author
+git shortlog -sne                      # number of commits per author with emails
 
 
 
@@ -102,7 +85,11 @@ git shortlog -s -n --all --no-merges   # number of commits per author
 # =======================
 sudo usermod -aG docker $USER
 
+# build on macOS with M1 (arm64) but need to run on amd64/linux
+docker build --platform linux/amd64 ...
+
 # typical docker clean up
+docker container prune
 docker rm $(docker ps -aq)
 docker rmi $(docker images -q)
 docker volume rm $(docker volume ls -qf dangling=true)
@@ -131,6 +118,36 @@ openssl s_client -CAfile ca.pem -cert cert.pem -key key.pem -connect host:port
 echo | openssl s_client -showcerts \
   -servname $DOMAIN -connect $IP_ADDRESS:443 \
   -verify 99 -verify_return_error
+
+
+
+# =======================
+# Some nice Java commands
+# =======================
+sudo jcmd <pid> GC.run       # force a GC
+sudo jmap -histo:live <pid>  # view heap
+JVM_OPTIONS="-J-server -J-verbose:gc \
+   -J-Xms${JVM_HEAP_MIN:-32M}               \
+   -J-Xmx${JVM_HEAP_MAX:-1024M}             \
+   -J-XX:+AggressiveOpts                    \
+   -J-XX:+UseConcMarkSweepGC                \
+   -J-XX:+CMSParallelRemarkEnabled          \
+   -J-XX:+CMSClassUnloadingEnabled          \
+   -J-XX:+ScavengeBeforeFullGC              \
+   -J-XX:+CMSScavengeBeforeRemark           \
+   -J-XX:+UseCMSInitiatingOccupancyOnly     \
+   -J-XX:CMSInitiatingOccupancyFraction=70  \
+   -J-XX:-TieredCompilation                 \
+   -J-XX:+UseStringDeduplication            \
+   -J-XX:+PrintGC                           \
+   -J-XX:+PrintGCTimeStamps                 \
+   -J-Xloggc:logs/app-gc.log                \
+   -J-XX:+UseGCLogFileRotation              \
+   -J-XX:NumberOfGCLogFiles=10              \
+   -J-XX:GCLogFileSize=100M                 \
+   -J-XX:+HeapDumpOnOutOfMemoryError        \
+   -J-XX:HeapDumpPath=\"logs/\"             "
+
 
 
 # =======================
