@@ -77,6 +77,7 @@ pidstat -w -I -t -p <pid> 3 # view context switches
 git log --format='%aN' | sort -u       # list all authors 
 git shortlog -s -n --all --no-merges   # number of commits per author
 git shortlog -sne                      # number of commits per author with emails
+git rev-parse --short HEAD             # commit hash shortened
 
 
 
