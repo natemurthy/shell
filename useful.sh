@@ -79,6 +79,14 @@ git shortlog -s -n --all --no-merges   # number of commits per author
 git shortlog -sne                      # number of commits per author with emails
 git rev-parse --short HEAD             # commit hash shortened
 
+# count commits since date
+git rev-list --count --since="YYYY-MM-DD" --all
+
+# count additions/removals since date
+git log --since="YYYY-MM-DD" --numstat --pretty=format:'-' | awk 'NF==3 {plus+=$1; minus+=$2} END {printf("Total additions: %s\nTotal removals: %s\n", plus, minus)}'
+
+
+
 
 
 # =======================
