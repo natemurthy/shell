@@ -1,11 +1,55 @@
 #!/bin/bash
+#
+# Some of the commands below have been generated with ChatGPT. For reference, see 
+#
+# https://chat.openai.com/c/b4861bd9-4bfc-4f1b-8405-78191525e529
+#
+
 
 # =======================
-# Word replacement
+# Find word replace, find folder delete 
 # =======================
 find *.json -print0 | xargs -0 sed -i 's/OldString/NewString/g'     # (non-recursive) files with whitespace delimited filenames
 find . -type f -name "*.txt" -exec sed -i 's/foo/bar/g' {} +        # (recursive) word replacement by filetype
 find ./ -type f -name "*.txt" -exec sed -i '' -e "s/foo/bar/" {} \; # (recursive) because Mac OX does things differently
+
+# Recursively walk all files in my current working directory that have the executable 
+# permission set
+# 
+# `find .`: This command starts the search from the current directory and its subdirectories.
+#
+# `-type f`: This option specifies that only regular files should be considered in the
+# search (excluding directories and other file types).
+#
+# `-perm +111`: This option filters the files and selects only those that have the executable
+# permission set. The +111 parameter indicates the executable permission for user, group, and
+# others. The value 111 represents the octal permission mode.
+find . -type f -perm +111
+
+# Remove every file and folder except README.md
+#
+# `! -name 'README.md'`: This part specifies that the README.md file should be excluded
+# from the search.
+#
+# `-mindepth 1`: This option ensures that the search starts from a minimum depth of 1, which 
+# means it excludes the current directory (.) itself from deletion.
+#
+# `-delete`: This option deletes the files and directories that match the specified criteria.
+find . ! -name 'README.md' -mindepth 1 -delete
+
+# Recursively delete all __pycache__ subdirs
+#
+# `-type d`: This option specifies that only directories should be considered in the search.
+#
+# `-name "__pycache__"`: This option filters the directories and selects only those named
+# `__pycache__`.
+#
+# `-exec rm -r {} +`: This part executes the rm -r command on each selected directory. `-r`
+# ensures that directories are deleted recursively. {} is a placeholder that represents each
+# directory found, and + signifies the end of the -exec command.
+find . -type d -name "__pycache__" -exec rm -r {} +
+
+
 
 
 # =======================
@@ -49,6 +93,21 @@ grep -color=never
 # Disk info commands
 # =======================
 du -ksh *
+
+# List folders in macOS Darwin Terminal and pipe the output to du to get the size of each
+# folder. Solution and explanation from ChatGPT ():
+#
+# `ls -d */`: This command lists only the directories (folders) in the current directory. 
+# The -d option ensures that only directories are listed, and the */ filters out files.
+#
+# `xargs -I{}`: This command takes the output from the previous command and passes it as 
+# arguments to the next command. -I{} specifies that {} will be replaced by the directory name.
+#
+# `du -sh "{}"`: This command uses du to calculate the size of each directory (`{}`). 
+#The -s option summarizes the size of each directory, and the -h option prints the sizes 
+# in human-readable format (e.g., "1.5G" for gigabytes).
+ls -d */ | xargs -I{} du -sh "{}"
+
 
 
 # =======================
