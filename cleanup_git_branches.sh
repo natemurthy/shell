@@ -22,7 +22,6 @@ propose_git_branch_cleanup() {
 
 confirmed_git_branch_cleanup() {
   for b in "${candidate_branches_to_delete[@]}"; do
-    echo "Deleteing $b"
     git branch -D $b
   done
 }
