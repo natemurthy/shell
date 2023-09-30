@@ -51,12 +51,12 @@ find . -type d -name "__pycache__" -exec rm -r {} +
 
 
 
-
 # =======================
 # Users and Groups
 # =======================
 sudo -u <user> -EH bash  # switch user and start a new bash session
 id -u $USER              # get user's UID
+
 
 
 # =======================
@@ -70,6 +70,7 @@ else
     #PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
     PS1='${debian_chroot:+($debian_chroot)}\u:\W\$ '
 fi
+
 
 
 # =======================
@@ -121,6 +122,7 @@ sudo conntrack -L | awk '{print $5,$4}' | grep src | \
   perl -MSocket -nle 'm{\s((\d+\.){3}\d+)} && do{ ($hostname)=qx(host $1 10.233.0.3) =~ m{domain name pointer (.*)}; print "$_ ($hostname)"}' | head
 
 
+
 # =======================
 # Process info
 # =======================
@@ -143,8 +145,6 @@ git rev-list --count --since="YYYY-MM-DD" --all
 
 # count additions/removals since date
 git log --since="YYYY-MM-DD" --numstat --pretty=format:'-' | awk 'NF==3 {plus+=$1; minus+=$2} END {printf("Total additions: %s\nTotal removals: %s\n", plus, minus)}'
-
-
 
 
 
