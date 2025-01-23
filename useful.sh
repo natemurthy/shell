@@ -161,6 +161,7 @@ docker container prune
 docker rm $(docker ps -aq)
 docker rmi $(docker images -q)
 docker volume rm $(docker volume ls -qf dangling=true)
+docker volume prune
 
 # more specialized clean up
 sudo docker ps -a | grep Exit | cut -d ' ' -f 1 | xargs sudo docker rm
