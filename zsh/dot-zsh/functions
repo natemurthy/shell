@@ -2,7 +2,23 @@
 # ZSH prestart
 # =============================================================================================
 
-# cmd line prompt
+autoload -Uz vcs_info
+
+precmd_vcs_info() { vcs_info }
+precmd_functions+=( precmd_vcs_info )
+
+setopt PROMPT_SUBST # set up prompt with git branch name
+# https://www.ditig.com/256-colors-cheat-sheet
+# https://stackoverflow.com/a/2534676
+NEWLINE=$'\n'
+PROMPT='${NEWLINE}%F{039}%n%f in %F{202}${PWD/#$HOME/~}%f ${vcs_info_msg_0_}
+%{$fg[white]%}> %{$reset_color%}'
+
+# Format the vcs_info_msg_0_ variable
+# TODO: https://github.com/agnoster/agnoster-zsh-theme (for branch icon from powerline font)
+zstyle ':vcs_info:git:*' formats '(on %F{002}%b%f)'
+
+# cmd line prompt (old way of doing things, prefer the above)
 function precmd {
   if [[ $USER == "nmurthy" ]]; then
     PS1="%{$fg[cyan]%}%n%{$fg[default]%}:%1~\$ "
@@ -27,6 +43,46 @@ fd() {
 gospace() {
   cd $GOPATH/src
   pwd
+}
+
+function pull-all () {
+  # Save the original directory
+  original_dir="$PWD"
+
+  # Define the base path
+  base_path="$HOME/code/src/github.com/verse-inc"
+
+  # Define the repository subfolders
+  repos=("infra" "mainland" "dataland" "frontend")
+
+  # Loop through each repository
+  for repo in "${repos[@]}"; do
+    repo_path="$base_path/$repo"
+
+      if [[ -d "$repo_path" ]]; then
+        pushd "$repo_path" > /dev/null
+
+        # Get the current branch name
+        curr_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+        # Check if on 'main' and there are no uncommitted changes
+        # The `--porcelain` flag outputs the status of the working directory and staging
+        # area in a machine-readable format which is more concise, and script-friendly
+        if [[ "$curr_branch" == "main" ]] && [[ -z "$(git status --porcelain)" ]]; then
+          echo "Pulling latest changes in $repo..."
+          git pull
+        else
+          echo "Skipping $repo (not on 'main' or has uncommitted changes)."
+        fi
+
+        popd > /dev/null
+      else
+        echo "Skipping $repo (directory does not exist)."
+      fi
+  done
+
+  # Return to the original directory
+  cd "$original_dir"
 }
 
 
