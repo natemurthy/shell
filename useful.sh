@@ -146,6 +146,9 @@ git rev-list --count --since="YYYY-MM-DD" --all
 # count additions/removals since date
 git log --since="YYYY-MM-DD" --numstat --pretty=format:'-' | awk 'NF==3 {plus+=$1; minus+=$2} END {printf("Total additions: %s\nTotal removals: %s\n", plus, minus)}'
 
+# list all objects in git repo across all branches ranked by descending size
+git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | sed -n 's/^blob //p' | sort -r --numeric-sort --key=2 | cut -c 1-12,41- | $(command -v gnumfmt || echo numfmt) --field=2 --to=iec-i --suffix=B --padding=7 --round=nearest
+
 
 
 # =======================
