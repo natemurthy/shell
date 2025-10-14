@@ -1,3 +1,5 @@
+#!/bin/zsh
+#
 # =============================================================================================
 # ZSH prestart
 # =============================================================================================
@@ -18,42 +20,20 @@ PROMPT='${NEWLINE}%F{039}%n%f in %F{202}${PWD/#$HOME/~}%f ${vcs_info_msg_0_}
 # TODO: https://github.com/agnoster/agnoster-zsh-theme (for branch icon from powerline font)
 zstyle ':vcs_info:git:*' formats '(on %F{002}%b%f)'
 
-# cmd line prompt (old way of doing things, prefer the above)
-function precmd {
-  if [[ $USER == "nmurthy" ]]; then
-    PS1="%{$fg[cyan]%}%n%{$fg[default]%}:%1~\$ "
-  else 
-    PS1="%{$fg[cyan]%}%n@%{$fg[default]%}%m:%1~\$ "
-  fi
-}
 
 # =============================================================================================
 # Helper functions
 # =============================================================================================
-f() {
-  vim $(fzf)
-}
-
-fd() {
-  # includes hidden directories
-  local dir
-  dir=$(find ${1:-.} -type d 2> /dev/null | fzf +m) && cd "$dir"
-}
-
-gospace() {
-  cd $GOPATH/src
-  pwd
-}
 
 function pull-all () {
   # Save the original directory
   original_dir="$PWD"
 
   # Define the base path
-  base_path="$HOME/code/src/github.com/verse-inc"
+  base_path="$HOME/code/src/github.com/org"
 
   # Define the repository subfolders
-  repos=("infra" "mainland" "dataland" "frontend")
+  repos=("repo-a" "repo-b" "repo-c")
 
   # Loop through each repository
   for repo in "${repos[@]}"; do
@@ -71,6 +51,7 @@ function pull-all () {
         if [[ "$curr_branch" == "main" ]] && [[ -z "$(git status --porcelain)" ]]; then
           echo "Pulling latest changes in $repo..."
           git pull
+          git fetch --prune
         else
           echo "Skipping $repo (not on 'main' or has uncommitted changes)."
         fi
@@ -79,10 +60,53 @@ function pull-all () {
       else
         echo "Skipping $repo (directory does not exist)."
       fi
+      echo ""
   done
 
   # Return to the original directory
   cd "$original_dir"
 }
 
+function all-objects () {
+  # Create temp file for branch mapping
+  tmpfile=$(mktemp)
+  datafile=$(mktemp)
+  trap "rm -f $tmpfile $datafile" EXIT
 
+  # Build object-to-branch mapping
+  git branch -a | sed 's/^[* ]*//' | while read branch; do
+    git rev-list --objects "$branch" | awk -v b="$branch" '{print $1 " " b}'
+  done | sort | awk '{if(obj!=$1){if(obj)print obj " " branches; obj=$1; branches=$2} else branches=branches","$2} END{if(obj)print obj " " branches}' > "$tmpfile"
+
+  # Process and save to temp file
+  git rev-list --objects --all | 
+  git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | 
+  sed -n 's/^blob //p' | 
+  sort -k1,1 | 
+  join -1 1 -2 1 -a 1 -o 1.1,1.2,1.3,2.2 - "$tmpfile" | 
+  awk '{printf "%.7s %s %s %s\n", $1, ($4=="" ? "unknown" : $4), $2, $3}' > "$datafile"
+
+  # Display sorted file list
+  sort -r --numeric-sort --key=3 "$datafile" | 
+  $(command -v gnumfmt || echo numfmt) --field=3 --to=si --suffix=B --padding=7 --round=nearest
+
+  # Calculate and display branch totals
+  echo ""
+  echo "--------------------------- Branch Totals ---------------------------"
+  awk '{
+    size = $3
+    branches = $2
+    split(branches, branch_arr, ",")
+    for (i in branch_arr) {
+      branch_totals[branch_arr[i]] += size
+    }
+  }
+  END {
+    for (branch in branch_totals) {
+      print branch " " branch_totals[branch]
+    }
+  }' "$datafile" | sort -k2 -rn | while read branch bytes; do
+    formatted=$(echo "$bytes" | $(command -v gnumfmt || echo numfmt) --to=si --suffix=B --padding=7 --round=nearest)
+    printf "%-60s %7s\n" "$branch" "$formatted"
+  done
+}
