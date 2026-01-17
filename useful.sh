@@ -9,9 +9,9 @@
 # =======================
 # Find word replace, find folder delete 
 # =======================
-find *.json -print0 | xargs -0 sed -i 's/OldString/NewString/g'     # (non-recursive) files with whitespace delimited filenames
-find . -type f -name "*.txt" -exec sed -i 's/foo/bar/g' {} +        # (recursive) word replacement by filetype
-find ./ -type f -name "*.txt" -exec sed -i '' -e "s/foo/bar/" {} \; # (recursive) because Mac OX does things differently
+find . -name *.txt -print0 | xargs -0 sed -i 's/OldString/NewString/g'  # (non-recursive) files with whitespace delimited filenames
+find . -type f -name "*.txt" -exec sed -i 's/foo/bar/g' {} +            # (recursive) word replacement by filetype
+find ./ -type f -name "*.txt" -exec sed -i '' -e "s/foo/bar/" {} \;     # (recursive) because Mac OX does things differently
 
 # Recursively walk all files in my current working directory that have the executable 
 # permission set
